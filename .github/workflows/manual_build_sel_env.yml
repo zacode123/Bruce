@@ -11,7 +11,7 @@ on:
       environment:
         description: 'Select environment to build'
         required: true
-        default: 'lilygo-t-embed-cc1101'
+        default: 'Marauder-Mini'
         type: choice
         options:
           - "m5stack-cardputer"
