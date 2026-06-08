@@ -232,9 +232,9 @@ void boot_screen() {
     tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
     tft.setTextSize(FM);
     tft.drawPixel(0, 0, bruceConfig.bgColor);
-    tft.drawCentreString("Bruce", tftWidth / 2, (tftHeight / 2) - 45, 1);
+    tft.drawCentreString("Bruce", tftWidth / 2, 18, 1);
     tft.setTextSize(FP);
-    tft.drawCentreString(BRUCE_VERSION, tftWidth / 2, (tftHeight / 2) - 30, 1);
+    tft.drawCentreString(BRUCE_VERSION, tftWidth / 2, 33, 1);
     tft.setTextSize(FM);
     #ifdef HAS_TOUCH
         tft.drawCentreString(
