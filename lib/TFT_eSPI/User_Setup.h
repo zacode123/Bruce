@@ -51,7 +51,7 @@
 
 // For ST7789, ST7735 and ILI9163 ONLY, define the pixel width and height in
 // portrait orientation
-#define TFT_WIDTH 80
+#define TFT_WIDTH  128
 // #define TFT_WIDTH  128
 // #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
 #define TFT_HEIGHT 160
@@ -259,7 +259,7 @@
 
 // Comment out the #define below to stop the SPIFFS filing system and smooth
 // font code being loaded this will save ~20kbytes of FLASH
-#define SMOOTH_FONT 1
+#define SMOOTH_FONT
 
 // ##################################################################################
 //
@@ -278,7 +278,7 @@
 // #define SPI_FREQUENCY   5000000
 // #define SPI_FREQUENCY  10000000
 // #define SPI_FREQUENCY  20000000
-#define SPI_FREQUENCY 27000000  // Actually sets it to 26.67MHz = 80/3
+#define SPI_FREQUENCY  27000000  // Actually sets it to 26.67MHz = 80/3
 // #define SPI_FREQUENCY  40000000 // Maximum to use SPIFFS
 // #define SPI_FREQUENCY  80000000
 
