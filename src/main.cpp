@@ -458,7 +458,7 @@ void setup() {
 
     // Set WiFi country to avoid warnings and ensure max power
     const wifi_country_t country = {
-        .cc = "US",
+        .cc = "IN",
         .schan = 1,
         .nchan = 14,
 #ifdef CONFIG_ESP_PHY_MAX_TX_POWER
