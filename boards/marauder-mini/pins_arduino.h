@@ -79,8 +79,8 @@ static const uint8_t ADC2 = 8;
 #define CC1101_SCK_PIN SPI_SCK_PIN
 #define CC1101_MISO_PIN SPI_MISO_PIN
 
-#define NRF24_CE_PIN -1
-#define NRF24_SS_PIN -1
+#define NRF24_CE_PIN 21
+#define NRF24_SS_PIN 22
 #define NRF24_MOSI_PIN SPI_MOSI_PIN
 #define NRF24_SCK_PIN SPI_SCK_PIN
 #define NRF24_MISO_PIN SPI_MISO_PIN
@@ -90,7 +90,7 @@ static const uint8_t ADC2 = 8;
 #define FG 2
 
 #define HAS_SCREEN 1
-#define ROTATION 0
+#define ROTATION 1
 #define MINBRIGHT 160
 
 /*
@@ -106,6 +106,5 @@ static const uint8_t ADC2 = 8;
 #define SPI_SCK_PIN 18
 #define SPI_MISO_PIN 19
 #define SPI_MOSI_PIN 23
-#define SPI_SS_PIN 1
 
 #endif /* Pins_Arduino_h */
