@@ -49,7 +49,7 @@ static const uint8_t G46 = 46;
 static const uint8_t ADC1 = 7;
 static const uint8_t ADC2 = 8;
 
-#define RGB_LED 21
+// #define RGB_LED 21
 
 #define BAD_TX 21
 #define BAD_RX 22
@@ -85,20 +85,20 @@ static const uint8_t ADC2 = 8;
 #define NRF24_SCK_PIN SPI_SCK_PIN
 #define NRF24_MISO_PIN SPI_MISO_PIN
 
-/*
 #define FP 1
 #define FM 1
 #define FG 2
-*/
 
 #define HAS_SCREEN 1
 #define ROTATION 0
 #define MINBRIGHT 160
 
+/*
 #define SDCARD_CS 4
 #define SDCARD_SCK 18
 #define SDCARD_MISO 19
 #define SDCARD_MOSI 23
+*/
 
 #define GROVE_SDA 33
 #define GROVE_SCL 26
