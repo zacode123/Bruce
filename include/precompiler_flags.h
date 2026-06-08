@@ -73,10 +73,10 @@
   #define ROTATION 1
 #endif
 #ifndef	TFT_WIDTH
-  #define TFT_WIDTH 128
+  #define TFT_WIDTH 160
 #endif
 #ifndef TFT_HEIGHT
-  #define TFT_HEIGHT 160
+  #define TFT_HEIGHT 128
 #endif
 
 #ifndef LORA_SCK
