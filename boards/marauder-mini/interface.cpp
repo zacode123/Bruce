@@ -14,7 +14,7 @@ void _setup_gpio() {
     pinMode(L_BTN, INPUT_PULLUP);
 
     bruceConfig.colorInverted = 0;
-    bruceConfigPins.rotation = 1;
+    bruceConfigPins.rotation = 3;
 }
 
 /***************************************************************************************
