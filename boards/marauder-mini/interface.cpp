@@ -37,6 +37,10 @@ int getBattery() { return 0; }
 ** set brightness value
 **********************************************************************/
 void _setBrightness(uint8_t brightval) {
+    ledcAttach(TFT_BL, 5000, 8);
+    uint8_t duty = map(brightval, 0, 100, 0, 255);
+    ledcWrite(TFT_BL, duty);
+    /*
     pinMode(TFT_BL, OUTPUT);
     if (brightval > 5) {
         digitalWrite(TFT_BL, LOW);
@@ -45,6 +49,7 @@ void _setBrightness(uint8_t brightval) {
         digitalWrite(TFT_BL, HIGH);
         digitalWrite(TFT_BL, LOW);
     }
+    */
 }
 
 /*********************************************************************
