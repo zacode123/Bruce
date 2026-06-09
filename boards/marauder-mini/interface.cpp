@@ -7,10 +7,10 @@
 ** Description:   initial setup for the device
 ***************************************************************************************/
 void _setup_gpio() {
-    pinMode(UP_BTN, INPUT_PULLUP);
     pinMode(SEL_BTN, INPUT_PULLUP);
-    pinMode(DW_BTN, INPUT_PULLUP);
     pinMode(R_BTN, INPUT_PULLUP);
+    pinMode(L_BTN, INPUT_PULLUP);
+    pinMode(DW_BTN, INPUT_PULLUP);
 
     bruceConfig.colorInverted = 0;
     bruceConfigPins.rotation = 3;
@@ -61,12 +61,12 @@ void InputHandler(void) {
     static unsigned long esc_tm = millis();
     static bool esc_armed = false;
     if (!(millis() - tm > 200 || LongPress)) return;
-
-    bool u = digitalRead(UP_BTN);
-    bool d = digitalRead(DW_BTN);
-    bool r = digitalRead(R_BTN);
+    
     bool s = digitalRead(SEL_BTN);
-    if (!s || !u || !d || !r) {
+    bool r = digitalRead(R_BTN);
+    bool l = digitalRead(L_BTN);
+    bool d = digitalRead(DW_BTN);
+    if (!s || !r || !l || !d) {
         tm = millis();
         if (!wakeUpScreen()) AnyKeyPress = true;
         else return;
@@ -89,7 +89,7 @@ void InputHandler(void) {
         EscPress = true;
     }
     if (!r) NextPress = true;
-    if (!u) UpPress = true;
+    if (!l) PrevPress = true;
     if (!d) DownPress = true;
 }
 
