@@ -61,9 +61,9 @@ static const uint8_t ADC2 = 8;
 #define GPS_SERIAL_RX SERIAL_RX
 #define HAS_BTN 1
 #define SEL_BTN 33
-#define UP_BTN 12
-#define DW_BTN 13
-#define R_BTN 27
+#define R_BTN 12
+#define L_BTN 13
+#define DW_BTN 26
 #define HAS_5_BUTTONS
 #define BTN_ALIAS "\"Ok\""
 #define BTN_ACT LOW
@@ -99,6 +99,6 @@ static const uint8_t ADC2 = 8;
 #define SPI_SCK_PIN 18
 #define SPI_MISO_PIN 19
 #define SPI_MOSI_PIN 23
-#define SPI_SS_PIN 22
+#define SPI_SS_PIN 27
 
 #endif /* Pins_Arduino_h */
