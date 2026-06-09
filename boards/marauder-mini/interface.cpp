@@ -22,7 +22,7 @@ void _setup_gpio() {
 ** Location: main.cpp
 ** Description:   second stage gpio setup to make a few functions work
 ***************************************************************************************/
-void _post_setup_gpio() { pinMode(TFT_BL, OUTPUT); }
+void _post_setup_gpio() { /* pinMode(TFT_BL, OUTPUT); */ }
 
 /***************************************************************************************
 ** Function name: getBattery()
