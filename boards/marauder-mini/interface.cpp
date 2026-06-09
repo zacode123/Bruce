@@ -21,7 +21,11 @@ void _setup_gpio() {
 ** Location: main.cpp
 ** Description:   second stage gpio setup to make a few functions work
 ***************************************************************************************/
-void _post_setup_gpio() { /* pinMode(TFT_BL, OUTPUT); */ }
+void _post_setup_gpio() {
+    pinMode(TFT_BL, OUTPUT);
+    ledcAttach(TFT_BL, TFT_BRIGHT_FREQ, TFT_BRIGHT_Bits);
+    ledcWrite(TFT_BL, 255);
+}
 
 /***************************************************************************************
 ** Function name: getBattery()
@@ -36,19 +40,16 @@ int getBattery() { return 0; }
 ** set brightness value
 **********************************************************************/
 void _setBrightness(uint8_t brightval) {
-    ledcAttach(TFT_BL, 5000, 8);
-    uint8_t duty = map(brightval, 0, 100, 0, 255);
-    ledcWrite(TFT_BL, duty);
-    /*
-    pinMode(TFT_BL, OUTPUT);
-    if (brightval > 5) {
-        digitalWrite(TFT_BL, LOW);
-        digitalWrite(TFT_BL, HIGH);
-    } else {
-        digitalWrite(TFT_BL, HIGH);
-        digitalWrite(TFT_BL, LOW);
-    }
-    */
+    int dutyCycle;
+    if (brightval == 100) dutyCycle = 255;
+    else if (brightval == 75) dutyCycle = 130;
+    else if (brightval == 50) dutyCycle = 70;
+    else if (brightval == 25) dutyCycle = 20;
+    else if (brightval == 0) dutyCycle = 0;
+    else dutyCycle = ((brightval * 255) / 100);
+
+    // log_i("dutyCycle for bright 0-255: %d", dutyCycle);
+    ledcWrite(TFT_BL, dutyCycle);
 }
 
 /*********************************************************************
