@@ -63,8 +63,7 @@ static const uint8_t ADC2 = 8;
 #define SEL_BTN 33
 #define UP_BTN 12
 #define DW_BTN 13
-#define R_BTN 14
-#define L_BTN 27
+#define R_BTN 27
 #define HAS_5_BUTTONS
 #define BTN_ALIAS "\"Ok\""
 #define BTN_ACT LOW
