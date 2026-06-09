@@ -11,7 +11,6 @@ void _setup_gpio() {
     pinMode(SEL_BTN, INPUT_PULLUP);
     pinMode(DW_BTN, INPUT_PULLUP);
     pinMode(R_BTN, INPUT_PULLUP);
-    pinMode(L_BTN, INPUT_PULLUP);
 
     bruceConfig.colorInverted = 0;
     bruceConfigPins.rotation = 3;
@@ -65,19 +64,14 @@ void InputHandler(void) {
     bool u = digitalRead(UP_BTN);
     bool d = digitalRead(DW_BTN);
     bool r = digitalRead(R_BTN);
-    bool l = digitalRead(L_BTN);
     bool s = digitalRead(SEL_BTN);
-    if (!s || !u || !d || !r || !l) {
+    if (!s || !u || !d || !r) {
         tm = millis();
         if (!wakeUpScreen()) AnyKeyPress = true;
         else return;
     }
-    if (!l && !s) {
-        EscPress = true;
-        return;
-    }
-    if (!l) {
-        PrevPress = true;
+    if (!s) {
+        SelPress = true;
         if (esc_armed == false) {
             esc_tm = millis();
             esc_armed = true;
@@ -92,7 +86,6 @@ void InputHandler(void) {
     if (!r) NextPress = true;
     if (!u) UpPress = true;
     if (!d) DownPress = true;
-    if (!s) SelPress = true;
 }
 
 /*********************************************************************
