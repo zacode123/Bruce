@@ -73,12 +73,16 @@ void InputHandler(void) {
     }
     if (!s) {
         SelPress = true;
-        if (esc_armed == false) {
+        if (!esc_armed) {
             esc_tm = millis();
             esc_armed = true;
         }
+    } else {
+        if (esc_armed) {
+            esc_armed = false;
+        }
     }
-    if (esc_armed && millis() - esc_tm > 1000) {
+    if (esc_armed && millis() - esc_tm > 2000) {
         esc_armed = false;
         esc_tm = millis();
         PrevPress = false;
