@@ -10,7 +10,7 @@ void _setup_gpio() {
     pinMode(SEL_BTN, INPUT_PULLUP);
     pinMode(R_BTN, INPUT_PULLUP);
     pinMode(L_BTN, INPUT_PULLUP);
-    pinMode(DW_BTN, INPUT_PULLUP);
+    pinMode(BK_BTN, INPUT_PULLUP);
 
     bruceConfig.colorInverted = 0;
     bruceConfigPins.rotation = 3;
@@ -58,39 +58,21 @@ void _setBrightness(uint8_t brightval) {
 **********************************************************************/
 void InputHandler(void) {
     static unsigned long tm = millis();
-    static unsigned long esc_tm = millis();
-    static bool esc_armed = false;
     if (!(millis() - tm > 200 || LongPress)) return;
     
     bool s = digitalRead(SEL_BTN);
     bool r = digitalRead(R_BTN);
     bool l = digitalRead(L_BTN);
-    bool d = digitalRead(DW_BTN);
-    if (!s || !r || !l || !d) {
+    bool b = digitalRead(BK_BTN);
+    if (!s || !r || !l || !b) {
         tm = millis();
         if (!wakeUpScreen()) AnyKeyPress = true;
         else return;
     }
-    if (!s) {
-        SelPress = true;
-        if (!esc_armed) {
-            esc_tm = millis();
-            esc_armed = true;
-        }
-    } else {
-        if (esc_armed) {
-            esc_armed = false;
-        }
-    }
-    if (esc_armed && millis() - esc_tm > 2000) {
-        esc_armed = false;
-        esc_tm = millis();
-        PrevPress = false;
-        EscPress = true;
-    }
+    if (!s) SelPress = true;
     if (!r) NextPress = true;
     if (!l) PrevPress = true;
-    if (!d) DownPress = true;
+    if (!b) EscPress = true;
 }
 
 /*********************************************************************
