@@ -80,7 +80,7 @@ static const uint8_t ADC2 = 8;
 
 #define FP 1
 #define FM 1
-#define FG 2
+#define FG 1
 
 #define HAS_SCREEN 1
 #define ROTATION 3
