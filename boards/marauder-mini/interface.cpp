@@ -35,7 +35,7 @@ void _post_setup_gpio() {
 int getBattery() { return 0; }
 
 /*********************************************************************
-** Function: setBrightness
+** Function: _setBrightness(uint8_t brightval)
 ** location: settings.cpp
 ** set brightness value
 **********************************************************************/
