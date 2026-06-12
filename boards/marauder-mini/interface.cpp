@@ -72,7 +72,10 @@ void InputHandler(void) {
     if (!s) SelPress = true;
     if (!r) NextPress = true;
     if (!l) PrevPress = true;
-    if (!b) EscPress = true;
+    if (!b) {
+        EscPress = true;
+        DownPress = true;
+    }
 }
 
 /*********************************************************************
