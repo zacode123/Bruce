@@ -96,4 +96,125 @@ void powerOff() {
 ** location: mykeyboard.cpp
 ** Btn logic to turn off the device (name is odd btw)
 **********************************************************************/
-void checkReboot() {}
+void checkReboot() {
+    if (!digitalRead(SEL_BTN) && !digitalRead(BK_BTN)) {
+        uint32_t startTime = millis();
+        int lastProgress = -1;
+        while (!digitalRead(SEL_BTN) && !digitalRead(BK_BTN)) {
+            uint32_t held = millis() - startTime;
+            if (held > 500) {
+                tft.fillRect(
+                    10,
+                    tftHeight / 2 - 22,
+                    tftWidth - 20,
+                    44,
+                    bruceConfig.bgColor
+                );
+                tft.setTextSize(1);
+                tft.setTextColor(
+                    bruceConfig.priColor,
+                    bruceConfig.bgColor
+                );
+                tft.drawCentreString(
+                    "Hold at least 3 sec to shutdown",
+                    tftWidth / 2,
+                    tftHeight / 2 - 20,
+                    1
+                );
+                tft.drawCentreString(
+                    "Release to cancel",
+                    tftWidth / 2,
+                    tftHeight / 2 + 12,
+                    1
+                );
+                int progress = min(
+                    100,
+                    (int)((held * 100UL) / 3000UL)
+                );
+                if (progress != lastProgress) {
+                    lastProgress = progress;
+                    tft.fillRect(
+                        21,
+                        tftHeight / 2 - 1,
+                        tftWidth - 42,
+                        6,
+                        bruceConfig.bgColor
+                    );
+                    tft.drawRect(
+                        20,
+                        tftHeight / 2 - 2,
+                        tftWidth - 40,
+                        8,
+                        bruceConfig.priColor
+                    );
+                    tft.fillRect(
+                        21,
+                        tftHeight / 2 - 1,
+                        ((tftWidth - 42) * progress) / 100,
+                        6,
+                        bruceConfig.priColor
+                    );
+                }
+                int secLeft = max(
+                    0,
+                    3 - (int)(held / 1000)
+                );
+                tft.drawCentreString(
+                    String(secLeft + 1) + "s",
+                    tftWidth / 2,
+                    tftHeight / 2 - 10,
+                    1
+                );
+            }
+
+            if (held >= 3000) {
+                while (!digitalRead(SEL_BTN) || !digitalRead(BK_BTN))
+                    delay(10);
+                
+                tft.fillScreen(bruceConfig.bgColor);
+                tft.setTextColor(bruceConfig.priColor);
+
+                for (int i = 3; i >= 1; i--) {
+                    tft.fillScreen(bruceConfig.bgColor);
+                    tft.setTextSize(1);
+                    tft.drawCentreString(
+                        "POWER OFF",
+                        tftWidth / 2,
+                        20,
+                        1
+                    );
+                    tft.setTextSize(3);
+                    tft.drawCentreString(
+                        String(i),
+                        tftWidth / 2,
+                        tftHeight / 2 - 15,
+                        1
+                    );
+                    delay(1000);
+                }
+                tft.fillScreen(bruceConfig.bgColor);
+                tft.setTextSize(1);
+                tft.drawCentreString(
+                    "SHUTTING DOWN",
+                    tftWidth / 2,
+                    tftHeight / 2 - 5,
+                    1
+                );
+                delay(1000);
+                powerOff();
+                return;
+            }
+            delay(10);
+        }
+        if (millis() - startTime > 500) {
+            tft.fillRect(
+                0,
+                tftHeight / 2 - 30,
+                tftWidth,
+                60,
+                bruceConfig.bgColor
+            );
+            drawStatusBar();
+        }
+    }
+}
