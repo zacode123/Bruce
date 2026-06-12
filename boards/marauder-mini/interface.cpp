@@ -83,7 +83,13 @@ void InputHandler(void) {
 ** location: mykeyboard.cpp
 ** Turns off the device (or try to)
 **********************************************************************/
-void powerOff() {}
+void powerOff() {
+    tft.fillScreen(bruceConfig.bgColor);
+    digitalWrite(TFT_BL, LOW);
+    tft.writecommand(0x10);
+    esp_sleep_enable_ext0_wakeup((gpio_num_t)SEL_BTN, LOW);
+    esp_deep_sleep_start();
+}
 
 /*********************************************************************
 ** Function: checkReboot
