@@ -460,14 +460,14 @@ void setup() {
     const wifi_country_t country = {
         .cc = "IN",
         .schan = 1,
-        .nchan = 14,
+        .nchan = 13,
 #ifdef CONFIG_ESP_PHY_MAX_TX_POWER
         .max_tx_power = CONFIG_ESP_PHY_MAX_TX_POWER, // 20
 #endif
         .policy = WIFI_COUNTRY_POLICY_MANUAL
     };
 
-    esp_wifi_set_max_tx_power(80); // 80 translates to 20dBm
+    esp_wifi_set_max_tx_power(84);
     esp_wifi_set_country(&country);
 
     // Some GPIO Settings (such as CYD's brightness control must be set after tft and sdcard)
