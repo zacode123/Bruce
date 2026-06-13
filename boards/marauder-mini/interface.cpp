@@ -159,6 +159,13 @@ void checkReboot() {
                     0,
                     3 - (int)(held / 1000)
                 );
+                tft.fillRect(
+                    tftWidth / 2 - 20,
+                    tftHeight / 2 - 10,
+                    40,
+                    10,
+                    bruceConfig.bgColor
+                );
                 tft.drawCentreString(
                     String(secLeft + 1) + "s",
                     tftWidth / 2,
