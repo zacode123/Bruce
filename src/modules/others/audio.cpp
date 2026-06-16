@@ -1,9 +1,4 @@
 #include "audio.h"
-#include "core/mykeyboard.h"
-
-#if __has_include(<M5Unified.h>)
-#include <M5Unified.h>
-#endif
 
 #if defined(MARAUDER_MINI)
 bool stopAudioPlayback() { return false; }
@@ -26,7 +21,14 @@ bool tts(String text, PlaybackMode mode) { return false; }
 bool isAudioFile(String filepath) { return false; }
 void playTone(unsigned int frequency, unsigned long duration, short waveType) {}
 void _tone(unsigned int frequency, unsigned long duration) {}
-#elif defined(HAS_NS4168_SPKR)
+#else
+#include "core/mykeyboard.h"
+
+#if __has_include(<M5Unified.h>)
+#include <M5Unified.h>
+#endif
+
+#if defined(HAS_NS4168_SPKR)
 #include "AudioFileSourceFunction.h"
 #include "AudioGeneratorAAC.h"
 #include "AudioGeneratorFLAC.h"
@@ -768,3 +770,4 @@ void _tone(unsigned int frequency, unsigned long duration) {
 #endif
 #endif
 }
+#endif
