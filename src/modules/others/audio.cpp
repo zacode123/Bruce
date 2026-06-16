@@ -5,7 +5,28 @@
 #include <M5Unified.h>
 #endif
 
-#if defined(HAS_NS4168_SPKR)
+#if defined(MARAUDER_MINI)
+bool stopAudioPlayback() { return false; }
+bool pauseAudioPlayback() { return false; }
+bool isAudioPlaying() { return false; }
+AudioPlaybackInfo getAudioPlaybackInfo() {
+    AudioPlaybackInfo info;
+    info.state = PLAYBACK_IDLE;
+    info.currentFile = "";
+    info.duration = 0;
+    info.position = 0;
+    info.volume = 0;
+    info.isAsyncMode = false;
+    return info;
+}
+void setAudioPlaybackVolume(uint8_t volume) {}
+bool playAudioFile(FS *fs, String filepath, PlaybackMode mode) { return false; }
+bool playAudioRTTTLString(String song, PlaybackMode mode) { return false; }
+bool tts(String text, PlaybackMode mode) { return false; }
+bool isAudioFile(String filepath) { return false; }
+void playTone(unsigned int frequency, unsigned long duration, short waveType) {}
+void _tone(unsigned int frequency, unsigned long duration) {}
+#elif defined(HAS_NS4168_SPKR)
 #include "AudioFileSourceFunction.h"
 #include "AudioGeneratorAAC.h"
 #include "AudioGeneratorFLAC.h"
