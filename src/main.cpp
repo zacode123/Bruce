@@ -365,15 +365,17 @@ void init_clock() {
     struct timeval tv = {.tv_sec = epoch};
     settimeofday(&tv, nullptr);
 #else
-    struct tm timeinfo = {};
-    timeinfo.tm_year = CURRENT_YEAR - 1900;
-    timeinfo.tm_mon = 0x05;
-    timeinfo.tm_mday = 0x14;
-    time_t epoch = mktime(&timeinfo);
-    rtc.setTime(epoch);
+    if (reason == ESP_RST_POWERON) {
+        struct tm timeinfo = {};
+        timeinfo.tm_year = CURRENT_YEAR - 1900;
+        timeinfo.tm_mon = 5;
+        timeinfo.tm_mday = 19;
+        time_t epoch = mktime(&timeinfo);
+        rtc.setTime(epoch);
+        struct timeval tv = {.tv_sec = epoch};
+        settimeofday(&tv, nullptr);
+    }
     clock_set = true;
-    struct timeval tv = {.tv_sec = epoch};
-    settimeofday(&tv, nullptr);
 #endif
 }
 
