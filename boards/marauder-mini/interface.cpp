@@ -36,7 +36,7 @@ void _post_setup_gpio() {
 ** location: display.cpp
 ** Description:   Delivers the battery value from 1-100
 ***************************************************************************************/
-int getBattery() { return 0; }
+int getBattery() { return 70; }
 
 /*********************************************************************
 ** Function: _setBrightness(uint8_t brightval)
