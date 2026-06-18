@@ -565,11 +565,3 @@ void loop() {
     vTaskDelay(10 / portTICK_PERIOD_MS);
 }
 #endif
-
-#ifdef CONFIG_BT_NIMBLE_ENABLED
-#error NIMBLE_ENABLED
-#endif
-
-#ifdef CONFIG_BT_BLUEDROID_ENABLED
-#error BLUEDROID_ENABLED
-#endif
