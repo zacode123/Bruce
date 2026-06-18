@@ -87,7 +87,7 @@ void powerOff() {
     tft.fillScreen(bruceConfig.bgColor);
     digitalWrite(TFT_BL, LOW);
     tft.writecommand(0x10);
-    esp_sleep_enable_ext0_wakeup((gpio_num_t)SEL_BTN, LOW);
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
     esp_deep_sleep_start();
 }
 
@@ -110,17 +110,18 @@ void checkReboot() {
                     44,
                     bruceConfig.bgColor
                 );
-                tft.setTextSize(1);
                 tft.setTextColor(
                     bruceConfig.priColor,
                     bruceConfig.bgColor
                 );
+                tft.setTextSize(2);
                 tft.drawCentreString(
-                    "Hold at least 3 sec to shutdown",
+                    "SHUT DOWN",
                     tftWidth / 2,
-                    tftHeight / 2 - 20,
+                    tftHeight / 2 - 30,
                     1
                 );
+                tft.setTextSize(FM);
                 tft.drawCentreString(
                     "Release to cancel",
                     tftWidth / 2,
@@ -175,6 +176,19 @@ void checkReboot() {
             }
 
             if (held >= 3000) {
+                tft.fillRect(
+                    10,
+                    tftHeight / 2 - 22,
+                    tftWidth - 20,
+                    44,
+                    bruceConfig.bgColor
+                );
+                tft.drawCentreString(
+                    "Release to Shutdown",
+                    tftWidth / 2,
+                    tftHeight / 2,
+                    1
+                );
                 while (!digitalRead(SEL_BTN) || !digitalRead(BK_BTN))
                     delay(10);
                 
@@ -183,7 +197,7 @@ void checkReboot() {
 
                 for (int i = 3; i >= 1; i--) {
                     tft.fillScreen(bruceConfig.bgColor);
-                    tft.setTextSize(1);
+                    tft.setTextSize(2);
                     tft.drawCentreString(
                         "POWER OFF",
                         tftWidth / 2,
