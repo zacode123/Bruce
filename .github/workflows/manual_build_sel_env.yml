@@ -123,8 +123,10 @@ jobs:
           echo "Preparing PlatformIO configuration..."
 
           # Manual builds always use commit SHA (simple and logical)
-          version="${GITHUB_SHA::7}"
-          echo "Using commit SHA: $version"
+          # version="${GITHUB_SHA::7}"
+          # echo "Using commit SHA: $version"
+
+          version="1.20.0" # Latest
 
           echo "VERSION=$version" >> $GITHUB_OUTPUT
 
