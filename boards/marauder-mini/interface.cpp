@@ -14,6 +14,8 @@ void _setup_gpio() {
 
     bruceConfig.colorInverted = 0;
     bruceConfigPins.rotation = 3;
+    
+    lastActivityTime = millis();
 }
 
 /***************************************************************************************
@@ -66,6 +68,7 @@ void InputHandler(void) {
     bool b = digitalRead(BK_BTN);
     if (!s || !r || !l || !b) {
         tm = millis();
+        lastActivityTime = millis();
         if (!wakeUpScreen()) AnyKeyPress = true;
         else return;
     }
@@ -97,6 +100,14 @@ void powerOff() {
 ** Btn logic to turn off the device (name is odd btw)
 **********************************************************************/
 void checkReboot() {
+    if (millis() - lastActivityTime >= 900000) {
+        tft.fillScreen(bruceConfig.bgColor);
+        tft.setTextColor(bruceConfig.priColor);
+        tft.setTextSize(2);
+        tft.drawCentreString("SLEEPING...", tftWidth / 2, tftHeight / 2, 1);
+        delay(2000); 
+        powerOff();
+    }
     if (!digitalRead(SEL_BTN) && !digitalRead(BK_BTN)) {
         uint32_t startTime = millis();
         int lastProgress = -1;
