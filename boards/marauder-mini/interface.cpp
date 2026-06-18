@@ -1,6 +1,8 @@
 #include "core/powerSave.h"
 #include <interface.h>
 
+unsigned long lastActivityTime = 0;
+
 /***************************************************************************************
 ** Function name: _setup_gpio()
 ** Location: main.cpp
