@@ -94,9 +94,9 @@ void powerOff() {
         bruceConfig.priColor,
         bruceConfig.bgColor
     );
-    tft.setTextSize(2);
+    tft.setTextSize(FM);
     tft.drawCentreString(
-        "SHUTDOWN IN",
+        "SHUT DOWN IN",
         tftWidth / 2,
         20,
         1
@@ -112,7 +112,7 @@ void powerOff() {
         delay(1000);
     }
     tft.fillScreen(bruceConfig.bgColor);
-    tft.setTextSize(2);
+    tft.setTextSize(FM);
     tft.drawCentreString(
         "SHUTTING DOWN",
         tftWidth / 2,
@@ -136,7 +136,7 @@ void checkReboot() {
     if (millis() - lastActivityTime >= 900000) {
         tft.fillScreen(bruceConfig.bgColor);
         tft.setTextColor(bruceConfig.priColor);
-        tft.setTextSize(2);
+        tft.setTextSize(FM);
         tft.drawCentreString("SLEEPING...", tftWidth / 2, tftHeight / 2, 1);
         delay(2000); 
         tft.fillScreen(bruceConfig.bgColor);
@@ -156,7 +156,7 @@ void checkReboot() {
                     bruceConfig.priColor,
                     bruceConfig.bgColor
                 );
-                tft.setTextSize(2);
+                tft.setTextSize(FM);
                 tft.drawCentreString(
                     "SHUT DOWN",
                     tftWidth / 2,
