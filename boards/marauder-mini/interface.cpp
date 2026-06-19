@@ -96,7 +96,7 @@ void powerOff() {
     );
     tft.setTextSize(2);
     tft.drawCentreString(
-        "TURNING OFF IN",
+        "SHUTDOWN IN",
         tftWidth / 2,
         20,
         1
