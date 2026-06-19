@@ -156,7 +156,7 @@ void checkReboot() {
                     bruceConfig.priColor,
                     bruceConfig.bgColor
                 );
-                tft.setTextSize(FM);
+                tft.setTextSize(FG);
                 tft.drawCentreString(
                     "SHUT DOWN",
                     tftWidth / 2,
