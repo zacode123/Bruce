@@ -155,7 +155,7 @@ private:
     static const uint8_t FLAG_LOW_ENDIAN_BYTES = 8;
 
     bool waitForAck = true;
-    int gfxFontSize = 1;
+    float gfxFontSize = 1.0f;
 
     int readPos = 0;
     int32_t curForeColor565 = -1;
@@ -834,8 +834,8 @@ public:
     }
     void setTextSize(float size) {
         if (size < 1.0f) size = 1.0f;
-        gfxFontSize = (int)size; 
-        textsize = gfxFontSize;
+        gfxFontSize = size; 
+        textsize = (int)size;
         textSize((FixedPoint32)(size * 524288.0f + 0.5f));
     }
     void setTextFont(uint8_t font) { setTextSize(font); }
@@ -903,16 +903,18 @@ public:
 
     // TODO: fix back color handling
     size_t write(uint8_t c) override {
+        int current_font_height = (int)(8.0f * gfxFontSize);
+        int current_font_width  = (int)(5.0f * gfxFontSize);
         if (c == '\n') {
-            cursor_y += 8 * gfxFontSize;
+            cursor_y += current_font_height;
             cursor_x = 0;
         }
-        if (wrap && cursor_x + 5 * gfxFontSize > width()) {
+        if (wrap && cursor_x + current_font_width > width()) {
             cursor_x = 0;
-            cursor_y += 8 * gfxFontSize;
+            cursor_y += current_font_height;
         }
         text(cursor_x, cursor_y, (char *)&c, 1);
-        cursor_x += 5 * gfxFontSize;
+        cursor_x += current_font_width;
         return 0;
     }
 
@@ -921,32 +923,32 @@ public:
         int l = strlen(s);
         char *clean = (char *)malloc(l + 1);
         if (!clean) return 0;
-        // Remove '\n' from string
         int j = 0;
         for (int i = 0; i < l; ++i) {
             if (s[i] != '\n') clean[j++] = s[i];
         }
         clean[j] = '\0';
-
         int w = width();
         int len = j;
-        if (!wrap || cursor_x + 5 * gfxFontSize * len <= w) {
+        int current_font_width  = (int)(5.0f * gfxFontSize);
+        int current_font_height = (int)(8.0f * gfxFontSize);
+        if (!wrap || cursor_x + current_font_width * len <= w) {
             text(cursor_x, cursor_y, clean);
-            cursor_x += 5 * gfxFontSize * len;
+            cursor_x += current_font_width * len;
         } else {
             const char *p = clean;
             while (len > 0) {
-                int end = ((int)w - cursor_x) / (5 * gfxFontSize);
+                int end = ((int)w - cursor_x) / current_font_width;
                 if (end <= 0) {
                     cursor_x = 0;
-                    cursor_y += 8 * gfxFontSize;
-                    end = w / (5 * gfxFontSize);
+                    cursor_y += current_font_height;
+                    end = w / current_font_width;
                 }
                 if (end > len) end = len;
                 text(cursor_x, cursor_y, p, end);
                 p += end;
                 len -= end;
-                cursor_x = 5 * gfxFontSize * end;
+                cursor_x = current_font_width * end;
             }
         }
         free(clean);
