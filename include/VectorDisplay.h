@@ -832,10 +832,11 @@ public:
         rotation = r & 3;
         sendCommand('Y', &args, 2);
     }
-    void setTextSize(uint8_t size) {
-        gfxFontSize = size;
-        textsize = size;
-        textSize((FixedPoint32)size * 8 * 65536);
+    void setTextSize(float size) {
+        if (size < 1.0f) size = 1.0f;
+        gfxFontSize = (int)size; 
+        textsize = gfxFontSize;
+        textSize((FixedPoint32)(size * 524288.0f + 0.5f));
     }
     void setTextFont(uint8_t font) { setTextSize(font); }
 
