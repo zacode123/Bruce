@@ -365,8 +365,7 @@ void init_clock() {
     struct timeval tv = {.tv_sec = epoch};
     settimeofday(&tv, nullptr);
 #else
-    esp_reset_reason_t reason = esp_reset_reason();
-    if (reason == ESP_RST_POWERON) {
+    if (rtc.getYear() < CURRENT_YEAR) {
         struct tm timeinfo = {};
         timeinfo.tm_year = CURRENT_YEAR - 1900;
         timeinfo.tm_mon = 5;
