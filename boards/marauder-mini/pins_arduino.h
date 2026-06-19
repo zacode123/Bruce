@@ -79,8 +79,8 @@ static const uint8_t ADC2 = 8;
 #define CC1101_MISO_PIN SPI_MISO_PIN
 
 #define FP 1
-#define FM 1
-#define FG 1
+#define FM 1.6
+#define FG 2.4
 
 #define HAS_SCREEN 1
 #define ROTATION 3
