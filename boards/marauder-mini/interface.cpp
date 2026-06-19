@@ -90,6 +90,37 @@ void InputHandler(void) {
 **********************************************************************/
 void powerOff() {
     tft.fillScreen(bruceConfig.bgColor);
+    tft.setTextColor(
+        bruceConfig.priColor,
+        bruceConfig.bgColor
+    );
+    tft.setTextSize(2);
+    tft.drawCentreString(
+        "TURNING OFF IN",
+        tftWidth / 2,
+        20,
+        1
+    );
+    tft.setTextSize(3);
+    for (int i = 3; i >= 1; i--) {
+        tft.drawCentreString(
+            String(i),
+            tftWidth / 2,
+            tftHeight / 2 - 15,
+            1
+        );
+        delay(1000);
+    }
+    tft.fillScreen(bruceConfig.bgColor);
+    tft.setTextSize(2);
+    tft.drawCentreString(
+        "SHUTTING DOWN",
+        tftWidth / 2,
+        tftHeight / 2 - 5,
+        1
+    );
+    delay(1000);
+    tft.fillScreen(bruceConfig.bgColor);
     digitalWrite(TFT_BL, LOW);
     tft.writecommand(0x10);
     esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
@@ -108,7 +139,11 @@ void checkReboot() {
         tft.setTextSize(2);
         tft.drawCentreString("SLEEPING...", tftWidth / 2, tftHeight / 2, 1);
         delay(2000); 
-        powerOff();
+        tft.fillScreen(bruceConfig.bgColor);
+        digitalWrite(TFT_BL, LOW);
+        tft.writecommand(0x10);
+        esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+        esp_deep_sleep_start();
     }
     if (!digitalRead(SEL_BTN) && !digitalRead(BK_BTN)) {
         uint32_t startTime = millis();
@@ -172,45 +207,14 @@ void checkReboot() {
             }
 
             if (held >= 3000) {
+                tft.fillScreen(bruceConfig.bgColor);
                 tft.drawCentreString(
                     "Release to Shutdown",
                     tftWidth / 2,
                     tftHeight / 2,
                     1
                 );
-                while (!digitalRead(SEL_BTN) || !digitalRead(BK_BTN))
-                    delay(10);
-                
-                tft.fillScreen(bruceConfig.bgColor);
-                tft.setTextColor(bruceConfig.priColor);
-
-                for (int i = 3; i >= 1; i--) {
-                    tft.fillScreen(bruceConfig.bgColor);
-                    tft.setTextSize(2);
-                    tft.drawCentreString(
-                        "TURNING OFF",
-                        tftWidth / 2,
-                        20,
-                        1
-                    );
-                    tft.setTextSize(3);
-                    tft.drawCentreString(
-                        String(i),
-                        tftWidth / 2,
-                        tftHeight / 2 - 15,
-                        1
-                    );
-                    delay(1000);
-                }
-                tft.fillScreen(bruceConfig.bgColor);
-                tft.setTextSize(2);
-                tft.drawCentreString(
-                    "SHUTTING DOWN",
-                    tftWidth / 2,
-                    tftHeight / 2 - 5,
-                    1
-                );
-                delay(1000);
+                while (!digitalRead(SEL_BTN) || !digitalRead(BK_BTN)) delay(10);
                 powerOff();
                 return;
             }
