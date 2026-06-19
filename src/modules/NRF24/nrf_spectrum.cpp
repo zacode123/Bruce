@@ -311,11 +311,9 @@ void nrf_spectrum() {
     // WiFi channel markers (ch1=nrf12, ch6=nrf37, ch11=nrf62)
     tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
     int wifiChs[] = {12, 37, 62};
-    const char *wifiLabels[] = {"W1", "W6", "W11"};
     for (int w = 0; w < 3; w++) {
         int wx, ww;
         getBarGeom(wifiChs[w], wx, ww);
-        tft.drawCentreString(wifiLabels[w], wx + ww / 2, labelY + 7, 1);
         tft.drawFastVLine(wx + ww / 2, spec_barAreaY + spec_barAreaH + 1, 3, TFT_CYAN);
     }
 
