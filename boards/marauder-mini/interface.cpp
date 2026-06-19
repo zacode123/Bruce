@@ -116,13 +116,7 @@ void checkReboot() {
         while (!digitalRead(SEL_BTN) && !digitalRead(BK_BTN)) {
             uint32_t held = millis() - startTime;
             if (held > 500) {
-                tft.fillRect(
-                    10,
-                    tftHeight / 2 - 22,
-                    tftWidth - 20,
-                    44,
-                    bruceConfig.bgColor
-                );
+                tft.fillScreen(bruceConfig.bgColor);
                 tft.setTextColor(
                     bruceConfig.priColor,
                     bruceConfig.bgColor
@@ -141,44 +135,33 @@ void checkReboot() {
                     tftHeight / 2 + 12,
                     1
                 );
+                tft.drawRect(
+                    20,
+                    tftHeight / 2 - 2,
+                    tftWidth - 40,
+                    8,
+                    bruceConfig.priColor
+                );
                 int progress = min(
                     100,
                     (int)((held * 100UL) / 3000UL)
                 );
                 if (progress != lastProgress) {
                     lastProgress = progress;
-                    tft.fillRect(
-                        21,
-                        tftHeight / 2 - 1,
-                        tftWidth - 42,
-                        6,
-                        bruceConfig.bgColor
-                    );
-                    tft.drawRect(
-                        20,
-                        tftHeight / 2 - 2,
-                        tftWidth - 40,
-                        8,
-                        bruceConfig.priColor
-                    );
-                    tft.fillRect(
-                        21,
-                        tftHeight / 2 - 1,
-                        ((tftWidth - 42) * progress) / 100,
-                        6,
-                        bruceConfig.priColor
-                    );
+                    int totalWidth = tftWidth - 42;
+                    int progressWidth = (totalWidth * progress) / 100;
+                    int remainderWidth = totalWidth - progressWidth;
+                    int barY = tftHeight / 2 - 1;
+                    if (progressWidth > 0) {
+                        tft.fillRect(21, barY, progressWidth, 6, bruceConfig.priColor);
+                    }
+                    if (remainderWidth > 0) {
+                        tft.fillRect(21 + progressWidth, barY, remainderWidth, 6, bruceConfig.bgColor);
+                    }
                 }
                 int secLeft = max(
                     0,
                     3 - (int)(held / 1000)
-                );
-                tft.fillRect(
-                    tftWidth / 2 - 20,
-                    tftHeight / 2 - 10,
-                    40,
-                    10,
-                    bruceConfig.bgColor
                 );
                 tft.drawCentreString(
                     String(secLeft + 1) + "s",
@@ -189,13 +172,6 @@ void checkReboot() {
             }
 
             if (held >= 3000) {
-                tft.fillRect(
-                    10,
-                    tftHeight / 2 - 22,
-                    tftWidth - 20,
-                    44,
-                    bruceConfig.bgColor
-                );
                 tft.drawCentreString(
                     "Release to Shutdown",
                     tftWidth / 2,
@@ -212,7 +188,7 @@ void checkReboot() {
                     tft.fillScreen(bruceConfig.bgColor);
                     tft.setTextSize(2);
                     tft.drawCentreString(
-                        "POWER OFF",
+                        "TURNING OFF",
                         tftWidth / 2,
                         20,
                         1
@@ -227,7 +203,7 @@ void checkReboot() {
                     delay(1000);
                 }
                 tft.fillScreen(bruceConfig.bgColor);
-                tft.setTextSize(1);
+                tft.setTextSize(2);
                 tft.drawCentreString(
                     "SHUTTING DOWN",
                     tftWidth / 2,
