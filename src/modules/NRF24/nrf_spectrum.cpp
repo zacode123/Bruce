@@ -3,14 +3,14 @@
  * @brief Enhanced 2.4 GHz spectrum analyzer for Bruce firmware.
  *
  * Features:
- *  - 126 channels (full 2.400-2.525 GHz ISM band)
- *  - Color gradient bars (green→yellow→red based on signal level)
- *  - Peak hold markers with slow decay
- *  - Smooth EMA (Exponential Moving Average) filtering
- *  - 6 simultaneous receive pipes for maximum sensitivity
- *  - Adaptive layout for all screen resolutions
- *  - Grid lines every 10 channels for visual reference
- *  - PA+LNA module support (E01-ML01SP2: -90dBm effective threshold)
+ * - 126 channels (full 2.400-2.525 GHz ISM band)
+ * - Color gradient bars (green→yellow→red based on signal level)
+ * - Peak hold markers with slow decay
+ * - Smooth EMA (Exponential Moving Average) filtering
+ * - 6 simultaneous receive pipes for maximum sensitivity
+ * - Adaptive layout for all screen resolutions
+ * - Grid lines every 10 channels for visual reference
+ * - PA+LNA module support (E01-ML01SP2: -90dBm effective threshold)
  *
  * RPD (Received Power Detector) is binary: 1 = signal above -64dBm
  * at chip input (-90dBm with PA+LNA module).
@@ -20,8 +20,17 @@
 #include "core/display.h"
 #include "core/mykeyboard.h"
 
+// ── Drop-in Compatibility Fixes ─────────────────────────────────
+#ifndef CHANNELS
+#define CHANNELS 80 // Fallback for the original header's channel count
+#endif
+#define NRF_SPECTRUM_CHANNELS 126 // Full 2.4GHz ISM band spectrum channels
+
+// Instantiate the original global variable to satisfy the linker/header
+uint8_t channel[CHANNELS]; 
+
 // ── Spectrum data ───────────────────────────────────────────────
-static uint8_t channel[NRF_SPECTRUM_CHANNELS];
+static uint8_t spec_channels[NRF_SPECTRUM_CHANNELS]; // Renamed to avoid header conflict
 static uint8_t peakHold[NRF_SPECTRUM_CHANNELS];
 static uint8_t peakTimer[NRF_SPECTRUM_CHANNELS];
 
@@ -55,18 +64,18 @@ static const struct DeviceInfo deviceInfo[] = {
 };
 
 // Detect device type from channel number
-static inline DeviceType getDeviceType(int channel) {
+static inline DeviceType getDeviceType(int ch) {
     // WiFi: ch 1-14 (2.412-2.484 GHz) → NRF ch 12-84
-    if (channel >= 12 && channel <= 84) return DEV_WIFI;
+    if (ch >= 12 && ch <= 84) return DEV_WIFI;
 
     // BLE Advertising: ch 37-39 (2.402, 2.426, 2.480 GHz) → NRF ch 2, 26, 80
-    if (channel == 2 || channel == 26 || channel == 80) return DEV_BLE;
+    if (ch == 2 || ch == 26 || ch == 80) return DEV_BLE;
 
     // BT Classic: ch ~50-79 (2.450-2.480 GHz) → NRF ch 50-79
-    if (channel >= 50 && channel <= 79) return DEV_BT;
+    if (ch >= 50 && ch <= 79) return DEV_BT;
 
     // Zigbee/Thread: ch 11-26 + 5-80 with 5MHz spacing (2.405-2.480 GHz) → NRF ch 5,10,15...80
-    if (channel >= 5 && channel <= 80 && (channel - 5) % 5 == 0) return DEV_ZIGBEE;
+    if (ch >= 5 && ch <= 80 && (ch - 5) % 5 == 0) return DEV_ZIGBEE;
 
     return DEV_NONE;
 }
@@ -123,20 +132,23 @@ String scanChannels(bool web) {
         int rpd = NRFradio.testRPD() ? 1 : 0;
 
         // EMA smoothing: fast attack, medium decay
-        // Attack: signal instantly jumps to ~50 on first hit
-        // Decay: drops ~25% per sweep when signal gone
         if (rpd) {
-            channel[i] = (uint8_t)min(100, (int)((channel[i] + 100) / 2));
+            spec_channels[i] = (uint8_t)min(100, (int)((spec_channels[i] + 100) / 2));
             deviceLabelTimer[i] = LABEL_DECAY_SWEEPS; // Reset label timer on active signal
         } else {
-            channel[i] = (uint8_t)((channel[i] * 3) / 4);
+            spec_channels[i] = (uint8_t)((spec_channels[i] * 3) / 4);
             // Decay label timer when no signal
             if (deviceLabelTimer[i] > 0) { deviceLabelTimer[i]--; }
         }
 
+        // Keep the original global array synchronized for safety/legacy WebUI references
+        if (i < CHANNELS) {
+            channel[i] = spec_channels[i];
+        }
+
         // Peak hold tracking
-        if (channel[i] >= peakHold[i]) {
-            peakHold[i] = channel[i];
+        if (spec_channels[i] >= peakHold[i]) {
+            peakHold[i] = spec_channels[i];
             peakTimer[i] = PEAK_HOLD_SWEEPS;
         } else if (peakTimer[i] > 0) {
             peakTimer[i]--;
@@ -152,108 +164,104 @@ String scanChannels(bool web) {
 
     // ── Draw spectrum bars (modes 0, 1, 2) ──────────────────────
     if (specDisplayMode != 3) {
-    uint8_t maxLevel = 0;
-    uint8_t maxCh = 0;
+        uint8_t maxLevel = 0;
+        uint8_t maxCh = 0;
 
-    for (int i = 0; i < NRF_SPECTRUM_CHANNELS; i++) {
-        int x, w;
-        getBarGeom(i, x, w);
+        for (int i = 0; i < NRF_SPECTRUM_CHANNELS; i++) {
+            int x, w;
+            getBarGeom(i, x, w);
 
-        int level = channel[i];
-        if (level > maxLevel) {
-            maxLevel = level;
-            maxCh = i;
-        }
+            int level = spec_channels[i];
+            if (level > maxLevel) {
+                maxLevel = level;
+                maxCh = i;
+            }
 
-        int barH = (level * spec_barAreaH) / 100;
-        int peakH = (peakHold[i] * spec_barAreaH) / 100;
+            int barH = (level * spec_barAreaH) / 100;
+            int peakH = (peakHold[i] * spec_barAreaH) / 100;
 
-        // Grid line color (every 10 channels)
-        uint16_t gridColor = (i % 10 == 0) ? TFT_DARKGREY : bruceConfig.bgColor;
+            // Grid line color (every 10 channels)
+            uint16_t gridColor = (i % 10 == 0) ? TFT_DARKGREY : bruceConfig.bgColor;
 
-        // Main bar area: clear above, draw bar from bottom
-        if (barH < spec_barAreaH) { tft.fillRect(x, spec_barAreaY, w, spec_barAreaH - barH, gridColor); }
-        if (barH > 0) {
-            uint16_t barColor = getSpectrumColor(level);
-            tft.fillRect(x, spec_barAreaY + spec_barAreaH - barH, w, barH, barColor);
-        }
+            // Main bar area: clear above, draw bar from bottom
+            if (barH < spec_barAreaH) { tft.fillRect(x, spec_barAreaY, w, spec_barAreaH - barH, gridColor); }
+            if (barH > 0) {
+                uint16_t barColor = getSpectrumColor(level);
+                tft.fillRect(x, spec_barAreaY + spec_barAreaH - barH, w, barH, barColor);
+            }
 
-        // Peak hold marker (Mode 0 only): white line segment
-        if (specDisplayMode == 0 && peakH > 0 && peakH >= barH) {
-            int peakY = spec_barAreaY + spec_barAreaH - peakH;
-            if (peakY >= spec_barAreaY && peakY < spec_barAreaY + spec_barAreaH) {
-                tft.fillRect(x, peakY, w, 1, TFT_WHITE);
+            // Peak hold marker (Mode 0 only): white line segment
+            if (specDisplayMode == 0 && peakH > 0 && peakH >= barH) {
+                int peakY = spec_barAreaY + spec_barAreaH - peakH;
+                if (peakY >= spec_barAreaY && peakY < spec_barAreaY + spec_barAreaH) {
+                    tft.fillRect(x, peakY, w, 1, TFT_WHITE);
+                }
+            }
+
+            if (web) {
+                if (i > 0) result += ",";
+                result += String(level);
             }
         }
 
-        if (web) {
-            if (i > 0) result += ",";
-            result += String(level);
+        // Stats overlay (top, drawn after all bars)
+        {
+            int activeCh = 0;
+            for (int i = 0; i < NRF_SPECTRUM_CHANNELS; i++) {
+                if (spec_channels[i] > 10) activeCh++;
+            }
+            tft.setTextSize(FP);
+            char statBuf[36];
+            int stY = 1;
+            // Right: peak info
+            if (maxLevel > 10) {
+                int peakFreq = 2400 + (int)maxCh;
+                snprintf(statBuf, sizeof(statBuf), "PK:%dMHz %d%%", peakFreq, (int)maxLevel);
+                tft.fillRect(tftWidth - 110, stY, 110, 9, bruceConfig.bgColor);
+                tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
+                tft.drawRightString(statBuf, tftWidth - spec_marginL - 2, stY, 1);
+            }
+            // Left (below mode): active + sweep count
+            snprintf(statBuf, sizeof(statBuf), "ACT:%d SW:%lu", activeCh, sweepCount);
+            tft.fillRect(spec_marginL, stY + 10, 90, 9, bruceConfig.bgColor);
+            tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
+            tft.drawString(statBuf, spec_marginL, stY + 10, 1);
         }
-    }
 
-    // Stats overlay (top, drawn after all bars)
-    {
-        int activeCh = 0;
-        for (int i = 0; i < NRF_SPECTRUM_CHANNELS; i++) {
-            if (channel[i] > 10) activeCh++;
-        }
-        tft.setTextSize(FP);
-        char statBuf[36];
-        int stY = 1;
-        // Right: peak info
-        if (maxLevel > 10) {
-            int peakFreq = 2400 + (int)maxCh;
-            snprintf(statBuf, sizeof(statBuf), "PK:%dMHz %d%%", peakFreq, (int)maxLevel);
-            tft.fillRect(tftWidth - 110, stY, 110, 9, bruceConfig.bgColor);
-            tft.setTextColor(TFT_YELLOW, bruceConfig.bgColor);
-            tft.drawRightString(statBuf, tftWidth - spec_marginL - 2, stY, 1);
-        }
-        // Left (below mode): active + sweep count
-        snprintf(statBuf, sizeof(statBuf), "ACT:%d SW:%lu", activeCh, sweepCount);
-        tft.fillRect(spec_marginL, stY + 10, 90, 9, bruceConfig.bgColor);
-        tft.setTextColor(TFT_CYAN, bruceConfig.bgColor);
-        tft.drawString(statBuf, spec_marginL, stY + 10, 1);
-    }
+        // ── Draw device labels (Mode 2 only) ──────────────────────────
+        if (specDisplayMode == 2) {
+            int labelY = 2;
+            for (int i = 0; i < NRF_SPECTRUM_CHANNELS; i++) {
+                if ((spec_channels[i] > 10) || (deviceLabelTimer[i] > 0)) {
+                    DeviceType dev = getDeviceType(i);
 
-    // ── Draw device labels (Mode 2 only) ──────────────────────────
-    if (specDisplayMode == 2) {
-        // Group labels by channel and stack vertically
-        int labelY = 2;
-        for (int i = 0; i < NRF_SPECTRUM_CHANNELS; i++) {
-            // Show label if signal present or timer still active
-            if ((channel[i] > 10) || (deviceLabelTimer[i] > 0)) {
-                DeviceType dev = getDeviceType(i);
+                    if (dev != DEV_NONE) {
+                        int x, w;
+                        getBarGeom(i, x, w);
+                        int labelX = x + w / 2;
 
-                if (dev != DEV_NONE) {
-                    // Display known device label
-                    int x, w;
-                    getBarGeom(i, x, w);
-                    int labelX = x + w / 2; // Center on channel
+                        tft.setTextSize(FP);
+                        tft.setTextColor(deviceInfo[dev].labelColor, bruceConfig.bgColor);
+                        tft.drawCentreString(deviceInfo[dev].label, labelX, labelY, 1);
 
-                    tft.setTextSize(FP);
-                    tft.setTextColor(deviceInfo[dev].labelColor, bruceConfig.bgColor);
-                    tft.drawCentreString(deviceInfo[dev].label, labelX, labelY, 1);
+                        labelY += 8;
+                        if (labelY > tftHeight / 4) break; 
+                    } else if (spec_channels[i] > 10) {
+                        int x, w;
+                        getBarGeom(i, x, w);
+                        int labelX = x + w / 2;
 
-                    labelY += 8;                       // Stack labels vertically
-                    if (labelY > tftHeight / 4) break; // Prevent overflow
-                } else if (channel[i] > 10) {
-                    // Unknown device: show small "?" in gray
-                    int x, w;
-                    getBarGeom(i, x, w);
-                    int labelX = x + w / 2;
+                        tft.setTextSize(1); 
+                        tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
+                        tft.drawCentreString("?", labelX, labelY, 1);
 
-                    tft.setTextSize(1); // Tiny font
-                    tft.setTextColor(TFT_DARKGREY, bruceConfig.bgColor);
-                    tft.drawCentreString("?", labelX, labelY, 1);
-
-                    labelY += 6;
-                    if (labelY > tftHeight / 5) break;
+                        labelY += 6;
+                        if (labelY > tftHeight / 5) break;
+                    }
                 }
             }
         }
-    }
-    } // end if (specDisplayMode != 3)
+    } 
 
     // ── Waterfall mode (mode 3) ─────────────────────────────────
     if (specDisplayMode == 3) {
@@ -261,10 +269,9 @@ String scanChannels(bool web) {
         for (int i = 0; i < NRF_SPECTRUM_CHANNELS; i++) {
             int x, w;
             getBarGeom(i, x, w);
-            uint16_t color = (channel[i] > 3) ? getSpectrumColor(channel[i]) : bruceConfig.bgColor;
+            uint16_t color = (spec_channels[i] > 3) ? getSpectrumColor(spec_channels[i]) : bruceConfig.bgColor;
             tft.fillRect(x, spec_barAreaY + waterfallY, w, rowH, color);
         }
-        // Draw cursor line at next position
         int nextY = waterfallY + rowH;
         if (nextY < spec_barAreaH) {
             tft.drawFastHLine(spec_marginL, spec_barAreaY + nextY, spec_drawW, TFT_DARKGREY);
@@ -281,11 +288,12 @@ void nrf_spectrum() {
     tft.fillScreen(bruceConfig.bgColor);
 
     // Initialize data
+    memset(spec_channels, 0, sizeof(spec_channels));
     memset(channel, 0, sizeof(channel));
     memset(peakHold, 0, sizeof(peakHold));
     memset(peakTimer, 0, sizeof(peakTimer));
     memset(deviceLabelTimer, 0, sizeof(deviceLabelTimer));
-    specDisplayMode = 0; // Start in mode 0
+    specDisplayMode = 0; 
     waterfallY = 0;
     sweepCount = 0;
 
@@ -308,7 +316,6 @@ void nrf_spectrum() {
         int wx, ww;
         getBarGeom(wifiChs[w], wx, ww);
         tft.drawCentreString(wifiLabels[w], wx + ww / 2, labelY + 7, 1);
-        // Draw vertical tick mark at separator line
         tft.drawFastVLine(wx + ww / 2, spec_barAreaY + spec_barAreaH + 1, 3, TFT_CYAN);
     }
 
@@ -322,13 +329,10 @@ void nrf_spectrum() {
     tft.drawString(modeStr[specDisplayMode], spec_marginL, 2, 1);
 
     if (nrf_start(NRF_MODE_SPI)) {
-        // Configure for wideband spectrum sensing
         NRFradio.setAutoAck(false);
         NRFradio.disableCRC();
         NRFradio.setAddressWidth(2);
 
-        // Open 6 reading pipes at noise-detection addresses
-        // More pipes = higher sensitivity (radio checks all in parallel)
         const uint8_t noiseAddress[][2] = {
             {0x55, 0x55},
             {0xAA, 0xAA},
@@ -348,8 +352,14 @@ void nrf_spectrum() {
             if (check(SelPress)) {
                 specDisplayMode = (specDisplayMode + 1) % 4;
                 waterfallY = 0;
-                // Clear only spectrum bar area, preserve frequency labels at bottom
                 tft.fillRect(0, spec_barAreaY, tftWidth, spec_barAreaH, bruceConfig.bgColor);
+                
+                // Redraw the layout mode string after clearance
+                tft.setTextSize(FP);
+                tft.setTextColor(bruceConfig.priColor, bruceConfig.bgColor);
+                tft.fillRect(spec_marginL, 2, 100, 9, bruceConfig.bgColor);
+                tft.drawString(modeStr[specDisplayMode], spec_marginL, 2, 1);
+                
                 delay(200);
             }
         }
