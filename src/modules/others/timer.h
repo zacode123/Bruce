@@ -18,7 +18,7 @@ private:
     int timerX = tftWidth / 2;
     int timerY = tftHeight / 2;
     int underlineY = timerY + (fontSize + 1) * LH;
-    bool playSoundOnFinish = true; // Sound option
+    bool playSoundOnFinish = false; // Sound option
 
     void clearUnderline();
     void underlineHours();
