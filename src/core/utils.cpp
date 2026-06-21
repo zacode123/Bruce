@@ -123,14 +123,30 @@ void showDeviceInfo() {
         area.addLine("Free PSRAM: " + formatBytes(ESP.getFreePsram()));
     }
     area.addLine("");
+    area.addLine("[TASKS]");
+    
+    UBaseType_t count = uxTaskGetNumberOfTasks();
+    TaskStatus_t *tasks = (TaskStatus_t *)malloc(count * sizeof(TaskStatus_t));
+    
+    if (tasks) {
+        count = uxTaskGetSystemState(tasks, count, NULL);
+        for (UBaseType_t i = 0; i < count; i++) {
+            area.addLine(
+            String(tasks[i].pcTaskName) +
+                " C:" + String(tasks[i].xCoreID) +
+                " P:" + String(tasks[i].uxCurrentPriority) +
+                " HWM:" + String(tasks[i].usStackHighWaterMark)
+            );
+        }
+        free(tasks);
+    }
+    
+    area.addLine("");
     area.addLine("[NETWORK]");
     area.addLine("MAC addr: " + String(WiFi.macAddress()));
     String localIP = WiFi.localIP().toString();
     String softAPIP = WiFi.softAPIP().toString();
-    String ipStatus = (WiFi.status() == WL_CONNECTED) ? (localIP != "0.0.0.0"    ? localIP
-                                                         : softAPIP != "0.0.0.0" ? softAPIP
-                                                                                 : "No valid IP")
-                                                      : "Not connected";
+    String ipStatus = (WiFi.status() == WL_CONNECTED) ? (localIP != "0.0.0.0"    ? localIP : softAPIP != "0.0.0.0" ? softAPIP : "No valid IP") : "Not connected";
     area.addLine("IP address: " + ipStatus);
     area.addLine("");
     area.addLine("[STORAGE]");
