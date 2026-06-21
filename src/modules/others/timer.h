@@ -13,7 +13,7 @@
 
 class Timer {
 private:
-    int fontSize = 4;
+    int fontSize = FG;
     int duration = 0;
     int timerX = tftWidth / 2;
     int timerY = tftHeight / 2;
