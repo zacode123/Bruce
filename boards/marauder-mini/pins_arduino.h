@@ -51,8 +51,8 @@ static const uint8_t ADC2 = 8;
 
 // #define RGB_LED 21
 
-// #define BAD_TX 21
-// #define BAD_RX 22
+#define BAD_TX -1
+#define BAD_RX -1
 
 // SERIAL (GPS) dedicated pins
 #define SERIAL_TX 21
