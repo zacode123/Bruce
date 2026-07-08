@@ -644,14 +644,14 @@ void captureShellPromptLine(const String &line) {
 int getTerminalCols() {
     int usableWidth = tftWidth - (TERMINAL_PAD_X * 2);
     int colWidth = max(1.0f, FP * LW);
-    return max(20.0f, usableWidth / colWidth);
+    return max(20.0f, float(usableWidth / colWidth));
 }
 
 int getTerminalRows() {
     int usableHeight = tftHeight - (TERMINAL_PAD_Y * 2);
     if (!getQueuedPromptContext().isEmpty()) usableHeight -= FP * LH;
     int rowHeight = max(1.0f, FP * LH);
-    return max(4.0f, usableHeight / rowHeight);
+    return max(4.0f, float(usableHeight / rowHeight));
 }
 
 void renderVisibleText(const String &title, const String &text, bool appendNewline) {
