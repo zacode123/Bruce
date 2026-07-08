@@ -511,7 +511,7 @@ void ensureCursorOnFreshLine() {
 }
 
 void redrawCurrentCommandLine() {
-    int lineHeight = max(1, FP * LH);
+    int lineHeight = max(1.0f, FP * LH);
     int lineY = tft.getCursorY();
     if (lineY < TERMINAL_PAD_Y) lineY = TERMINAL_PAD_Y;
 
