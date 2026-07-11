@@ -80,6 +80,7 @@ void InputHandler(void) {
     if (!b) {
         EscPress = true;
         DownPress = true;
+        return;
     }
 }
 
