@@ -124,7 +124,8 @@ void powerOff() {
     tft.fillScreen(bruceConfig.bgColor);
     digitalWrite(TFT_BL, LOW);
     tft.writecommand(0x10);
-    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, LOW);
+    delay(200);
     esp_deep_sleep_start();
 }
 
